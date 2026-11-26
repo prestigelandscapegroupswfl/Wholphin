@@ -44,7 +44,6 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -85,6 +84,7 @@ import com.github.damontecres.wholphin.ui.preferences.PreferenceScreenOption
 import com.github.damontecres.wholphin.ui.setup.UserIconCardImage
 import com.github.damontecres.wholphin.ui.spacedByWithFooter
 import com.github.damontecres.wholphin.ui.theme.LocalTheme
+import com.github.damontecres.wholphin.ui.theme.focusGradientBrush
 import com.github.damontecres.wholphin.ui.toServerString
 import com.github.damontecres.wholphin.ui.tryRequestFocus
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -732,31 +732,24 @@ fun NavigationDrawerScope.NavItem(
     }
 }
 
-/** Titanium Fin signature gradient: cyan -> violet -> magenta */
-val TitaniumGradientBrush: Brush =
-    Brush.horizontalGradient(
-        colors =
-            listOf(
-                Color(0xFF22D3EE),
-                Color(0xFF8B5CF6),
-                Color(0xFFE879F9),
-            ),
-    )
-
 /**
- * Draws the Titanium gradient outline around a drawer item while it is both selected and focused.
- * The border is drawn within the item's existing bounds, so it never shifts the layout.
+ * Draws the active theme's signature gradient outline around a drawer item while it is both
+ * selected and focused. Only the custom Titanium Fin themes have a gradient; the border is
+ * drawn within the item's existing bounds, so it never shifts the layout.
  */
-fun Modifier.titaniumGradientBorder(active: Boolean): Modifier =
-    if (active) {
+@Composable
+fun Modifier.titaniumGradientBorder(active: Boolean): Modifier {
+    val brush = LocalTheme.current.focusGradientBrush()
+    return if (active && brush != null) {
         border(
             width = 2.dp,
-            brush = TitaniumGradientBrush,
+            brush = brush,
             shape = RoundedCornerShape(50),
         )
     } else {
         this
     }
+}
 
 @Composable
 @ReadOnlyComposable
@@ -793,6 +786,8 @@ fun navItemColor(
                     AppThemeColors.RED,
                     AppThemeColors.BROWN,
                     AppThemeColors.TITANIUM,
+                    AppThemeColors.MIDNIGHT_GOLD,
+                    AppThemeColors.RETRO_ARCADE,
                     -> MaterialTheme.colorScheme.border
 
                     AppThemeColors.BOLD_BLUE,

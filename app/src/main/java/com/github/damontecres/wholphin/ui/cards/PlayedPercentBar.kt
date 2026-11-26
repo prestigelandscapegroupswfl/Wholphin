@@ -69,6 +69,8 @@ private fun playedPercentColor(): Color =
         AppThemeColors.BOLD_BLUE,
         AppThemeColors.OLED_BLACK,
         AppThemeColors.TITANIUM,
+        AppThemeColors.MIDNIGHT_GOLD,
+        AppThemeColors.RETRO_ARCADE,
         -> MaterialTheme.colorScheme.tertiary
 
         AppThemeColors.BROWN -> MaterialTheme.colorScheme.primary

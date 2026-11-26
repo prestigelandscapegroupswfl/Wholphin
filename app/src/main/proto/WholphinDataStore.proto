@@ -129,6 +129,8 @@ enum AppThemeColors {
   RED = 6;
   BROWN = 7;
   TITANIUM = 8;
+  MIDNIGHT_GOLD = 9;
+  RETRO_ARCADE = 10;
 }
 
 enum EdgeStyle{

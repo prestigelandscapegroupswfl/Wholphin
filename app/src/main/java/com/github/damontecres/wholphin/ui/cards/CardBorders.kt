@@ -7,24 +7,25 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Border
 import androidx.tv.material3.CardBorder
 import androidx.tv.material3.CardDefaults
-import com.github.damontecres.wholphin.preferences.AppThemeColors
-import com.github.damontecres.wholphin.ui.nav.TitaniumGradientBrush
 import com.github.damontecres.wholphin.ui.theme.LocalTheme
+import com.github.damontecres.wholphin.ui.theme.focusGradientBrush
 
 /**
- * Border for cards: under the Titanium theme, the focused card gets the signature
- * cyan -> violet -> magenta gradient outline; every other theme keeps the tv-material3 defaults.
+ * Border for cards: under the custom Titanium Fin themes, the focused card gets the theme's
+ * signature gradient outline; every other theme keeps the tv-material3 defaults.
  */
 @Composable
 @ReadOnlyComposable
-fun titaniumCardBorder(): CardBorder =
-    if (LocalTheme.current == AppThemeColors.TITANIUM) {
+fun titaniumCardBorder(): CardBorder {
+    val brush = LocalTheme.current.focusGradientBrush()
+    return if (brush != null) {
         CardDefaults.border(
             focusedBorder =
                 Border(
-                    border = BorderStroke(3.dp, TitaniumGradientBrush),
+                    border = BorderStroke(3.dp, brush),
                 ),
         )
     } else {
         CardDefaults.border()
     }
+}
