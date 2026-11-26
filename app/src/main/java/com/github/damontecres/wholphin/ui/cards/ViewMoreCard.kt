@@ -92,6 +92,7 @@ fun ViewMoreCard(
                 CardDefaults.colors(
                     containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp),
                 ),
+            border = titaniumCardBorder(),
         ) {
             Box(
                 contentAlignment = Alignment.Center,

@@ -81,6 +81,7 @@ fun GridCard(
                 CardDefaults.colors(
                     containerColor = Color.Transparent,
                 ),
+            border = titaniumCardBorder(),
         ) {
             ItemCardImage(
                 item = item,

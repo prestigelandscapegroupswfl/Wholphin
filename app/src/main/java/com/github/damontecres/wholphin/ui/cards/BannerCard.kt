@@ -112,6 +112,7 @@ fun BannerCard(
             CardDefaults.colors(
 //                containerColor = Color.Transparent,
             ),
+        border = titaniumCardBorder(),
     ) {
         Box(
             modifier =
