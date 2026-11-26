@@ -71,6 +71,7 @@ fun GenreCard(
             CardDefaults.colors(
                 containerColor = Color.Transparent,
             ),
+        border = titaniumCardBorder(),
     ) {
         Box(
             contentAlignment = Alignment.Center,

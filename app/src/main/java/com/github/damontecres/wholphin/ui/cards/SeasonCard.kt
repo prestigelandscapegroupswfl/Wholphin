@@ -166,6 +166,7 @@ fun SeasonCard(
                 CardDefaults.colors(
                     containerColor = Color.Transparent,
                 ),
+            border = titaniumCardBorder(),
         ) {
             Box(
                 modifier =

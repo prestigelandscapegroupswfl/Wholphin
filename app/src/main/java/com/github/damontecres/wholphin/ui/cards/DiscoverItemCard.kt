@@ -91,6 +91,7 @@ fun DiscoverItemCard(
                 CardDefaults.colors(
                     containerColor = Color.Transparent,
                 ),
+            border = titaniumCardBorder(),
         ) {
             Box(
                 modifier =

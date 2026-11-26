@@ -81,6 +81,9 @@ fun SwitchColors(): SwitchColors {
         AppThemeColors.OLED_BLACK,
         AppThemeColors.RED,
         AppThemeColors.BROWN,
+        AppThemeColors.TITANIUM,
+        AppThemeColors.MIDNIGHT_GOLD,
+        AppThemeColors.RETRO_ARCADE,
         -> {
             SwitchDefaults.colors(
                 checkedThumbColor = MaterialTheme.colorScheme.onPrimary,

@@ -2,12 +2,15 @@ package com.github.damontecres.wholphin.ui.nav
 
 import android.content.Context
 import androidx.activity.compose.BackHandler
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
@@ -23,13 +26,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReadOnlyComposable
@@ -39,21 +39,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -78,7 +76,6 @@ import com.github.damontecres.wholphin.services.NavDrawerService
 import com.github.damontecres.wholphin.services.NavigationManager
 import com.github.damontecres.wholphin.services.SetupDestination
 import com.github.damontecres.wholphin.services.SetupNavigationManager
-import com.github.damontecres.wholphin.ui.FontAwesome
 import com.github.damontecres.wholphin.ui.components.TimeDisplay
 import com.github.damontecres.wholphin.ui.enableMarquee
 import com.github.damontecres.wholphin.ui.ifElse
@@ -87,6 +84,7 @@ import com.github.damontecres.wholphin.ui.preferences.PreferenceScreenOption
 import com.github.damontecres.wholphin.ui.setup.UserIconCardImage
 import com.github.damontecres.wholphin.ui.spacedByWithFooter
 import com.github.damontecres.wholphin.ui.theme.LocalTheme
+import com.github.damontecres.wholphin.ui.theme.focusGradientBrush
 import com.github.damontecres.wholphin.ui.toServerString
 import com.github.damontecres.wholphin.ui.tryRequestFocus
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -366,7 +364,7 @@ fun NavDrawer(
                         IconNavItem(
                             text = stringResource(R.string.now_playing),
                             subtext = serviceState.nowPlayingTitle,
-                            icon = Icons.Default.PlayArrow,
+                            iconRes = R.drawable.nav_wf_nowplaying,
                             selected = selectedIndex == NOW_PLAYING_INDEX,
                             drawerOpen = isOpen,
                             interactionSource = interactionSource,
@@ -404,7 +402,7 @@ fun NavDrawer(
                             val interactionSource = remember { MutableInteractionSource() }
                             IconNavItem(
                                 text = stringResource(R.string.search),
-                                icon = Icons.Default.Search,
+                                iconRes = R.drawable.nav_wf_search,
                                 selected = selectedIndex == SEARCH_INDEX,
                                 drawerOpen = isOpen,
                                 interactionSource = interactionSource,
@@ -425,7 +423,7 @@ fun NavDrawer(
                             val interactionSource = remember { MutableInteractionSource() }
                             IconNavItem(
                                 text = stringResource(R.string.home),
-                                icon = Icons.Default.Home,
+                                iconRes = R.drawable.nav_wf_home,
                                 selected = selectedIndex == HOME_INDEX,
                                 drawerOpen = isOpen,
                                 interactionSource = interactionSource,
@@ -523,7 +521,7 @@ fun NavDrawer(
                             val interactionSource = remember { MutableInteractionSource() }
                             IconNavItem(
                                 text = stringResource(R.string.settings),
-                                icon = Icons.Default.Settings,
+                                iconRes = R.drawable.nav_wf_settings,
                                 selected = false,
                                 drawerOpen = isOpen,
                                 interactionSource = interactionSource,
@@ -607,7 +605,7 @@ fun NavigationDrawerScope.ProfileIcon(
 @Composable
 fun NavigationDrawerScope.IconNavItem(
     text: String,
-    icon: ImageVector,
+    @DrawableRes iconRes: Int,
     onClick: () -> Unit,
     selected: Boolean,
     drawerOpen: Boolean,
@@ -617,16 +615,18 @@ fun NavigationDrawerScope.IconNavItem(
 ) {
     val focused by interactionSource.collectIsFocusedAsState()
     NavigationDrawerItem(
-        modifier = modifier,
+        modifier = modifier.titaniumGradientBorder(selected && focused),
         selected = false,
         onClick = onClick,
         leadingContent = {
             val color = navItemColor(selected, focused, drawerOpen)
-            Icon(
-                icon,
+            Image(
+                painter = painterResource(iconRes),
                 contentDescription = null,
-                tint = color,
-                modifier = Modifier.size(DrawerIconSize),
+                modifier =
+                    Modifier
+                        .size(DrawerIconSize)
+                        .alpha(color.alpha),
             )
         },
         supportingContent =
@@ -660,39 +660,38 @@ fun NavigationDrawerScope.NavItem(
     containerColor: Color = Color.Unspecified,
 ) {
     val context = LocalContext.current
-    val useFont = library !is ServerNavDrawerItem || library.type != CollectionType.LIVETV
-    val icon =
+    val iconRes =
         remember(library) {
             when (library) {
                 NavDrawerItem.Favorites -> {
-                    R.string.fa_heart
+                    R.drawable.nav_wf_favorites
                 }
 
                 NavDrawerItem.More -> {
-                    R.string.fa_ellipsis
+                    R.drawable.nav_wf_more
                 }
 
                 NavDrawerItem.Discover -> {
-                    R.string.fa_magnifying_glass_plus
+                    R.drawable.nav_wf_discover
                 }
 
                 is ServerNavDrawerItem -> {
                     when (library.type) {
-                        CollectionType.MOVIES -> R.string.fa_film
-                        CollectionType.TVSHOWS -> R.string.fa_tv
-                        CollectionType.HOMEVIDEOS -> R.string.fa_video
-                        CollectionType.LIVETV -> R.drawable.gf_dvr
-                        CollectionType.MUSIC -> R.string.fa_music
-                        CollectionType.BOXSETS -> R.string.fa_open_folder
-                        CollectionType.PLAYLISTS -> R.string.fa_list_ul
-                        else -> R.string.fa_film
+                        CollectionType.MOVIES -> R.drawable.nav_wf_movies
+                        CollectionType.TVSHOWS -> R.drawable.nav_wf_tvshows
+                        CollectionType.HOMEVIDEOS -> R.drawable.nav_wf_homevideos
+                        CollectionType.LIVETV -> R.drawable.nav_wf_livetv
+                        CollectionType.MUSIC -> R.drawable.nav_wf_music
+                        CollectionType.BOXSETS -> R.drawable.nav_wf_boxsets
+                        CollectionType.PLAYLISTS -> R.drawable.nav_wf_playlists
+                        else -> R.drawable.nav_wf_movies
                     }
                 }
             }
         }
     val focused by interactionSource.collectIsFocusedAsState()
     NavigationDrawerItem(
-        modifier = modifier,
+        modifier = modifier.titaniumGradientBorder(selected && focused),
         selected = false,
         onClick = onClick,
         colors =
@@ -702,23 +701,14 @@ fun NavigationDrawerScope.NavItem(
         leadingContent = {
             val color = navItemColor(selected, focused, drawerOpen)
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                if (useFont) {
-                    Text(
-                        text = stringResource(icon),
-                        textAlign = TextAlign.Center,
-                        fontSize = 16.sp,
-                        fontFamily = FontAwesome,
-                        color = color,
-                        modifier = Modifier,
-                    )
-                } else {
-                    Icon(
-                        painter = painterResource(icon),
-                        contentDescription = null,
-                        tint = color,
-                        modifier = Modifier.size(DrawerIconSize),
-                    )
-                }
+                Image(
+                    painter = painterResource(iconRes),
+                    contentDescription = null,
+                    modifier =
+                        Modifier
+                            .size(DrawerIconSize)
+                            .alpha(color.alpha),
+                )
             }
         },
         trailingContent =
@@ -739,6 +729,25 @@ fun NavigationDrawerScope.NavItem(
             text = library.name(context),
             maxLines = 1,
         )
+    }
+}
+
+/**
+ * Draws the active theme's signature gradient outline around a drawer item while it is both
+ * selected and focused. Only the custom Titanium Fin themes have a gradient; the border is
+ * drawn within the item's existing bounds, so it never shifts the layout.
+ */
+@Composable
+fun Modifier.titaniumGradientBorder(active: Boolean): Modifier {
+    val brush = LocalTheme.current.focusGradientBrush()
+    return if (active && brush != null) {
+        border(
+            width = 2.dp,
+            brush = brush,
+            shape = RoundedCornerShape(50),
+        )
+    } else {
+        this
     }
 }
 
@@ -776,6 +785,9 @@ fun navItemColor(
                     AppThemeColors.ORANGE,
                     AppThemeColors.RED,
                     AppThemeColors.BROWN,
+                    AppThemeColors.TITANIUM,
+                    AppThemeColors.MIDNIGHT_GOLD,
+                    AppThemeColors.RETRO_ARCADE,
                     -> MaterialTheme.colorScheme.border
 
                     AppThemeColors.BOLD_BLUE,

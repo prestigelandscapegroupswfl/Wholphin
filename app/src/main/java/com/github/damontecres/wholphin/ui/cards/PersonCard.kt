@@ -121,6 +121,7 @@ fun PersonCard(
                 CardDefaults.colors(
                     containerColor = Color.Transparent,
                 ),
+            border = titaniumCardBorder(),
         ) {
             ItemCardImage(
                 imageUrl = imageUrl,
