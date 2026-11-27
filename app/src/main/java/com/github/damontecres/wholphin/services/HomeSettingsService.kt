@@ -285,8 +285,9 @@ class HomeSettingsService
                     navDrawerService.getAllUserLibraries(userId, userDto?.tvAccess ?: false)
                 }
 
-            val includedIds =
+            val latestRows =
                 libraries
+                    .filterNot { it.collectionType == CollectionType.BOXSETS }
                     .mapIndexed { index, library ->
                         val parentId = library.itemId
                         val title = getRecentlyAddedTitle(library.name)
@@ -309,15 +310,21 @@ class HomeSettingsService
                             )
                         }
                     }
-            val continueWatchingRow =
-                listOf(
-                    HomeRowConfigDisplay(
-                        id = includedIds.size + 1,
-                        title = ResStringProvider(R.string.combine_continue_next),
-                        config = HomeRowConfig.ContinueWatchingCombined(),
-                    ),
+            val continueWatching =
+                HomeRowConfigDisplay(
+                    id = latestRows.size,
+                    title = ResStringProvider(R.string.combine_continue_next),
+                    config = HomeRowConfig.ContinueWatchingCombined(),
                 )
-            val rowConfig = continueWatchingRow + includedIds
+            val genres =
+                libraries.firstOrNull { it.collectionType == CollectionType.MOVIES }?.let { movies ->
+                    HomeRowConfigDisplay(
+                        id = latestRows.size + 1,
+                        title = ResStringProvider(R.string.genres),
+                        config = HomeRowConfig.Genres(parentId = movies.itemId),
+                    )
+                }
+            val rowConfig = listOfNotNull(continueWatching, genres) + latestRows
             return HomePageResolvedSettings(userId, HomePageSettingsSource.DEFAULT, rowConfig)
         }
 
