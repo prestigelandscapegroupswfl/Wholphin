@@ -83,7 +83,6 @@ fun GenreCard(
         onClick = onClick,
         onLongClick = onLongClick,
         interactionSource = interactionSource,
-        border = titaniumCardBorder(),
         colors =
             CardDefaults.colors(
                 containerColor = Color.Transparent,

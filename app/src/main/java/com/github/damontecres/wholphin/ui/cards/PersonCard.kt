@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -36,6 +37,8 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.github.damontecres.wholphin.R
 import com.github.damontecres.wholphin.data.model.Person
+import com.github.damontecres.wholphin.ui.theme.LocalTheme
+import com.github.damontecres.wholphin.ui.theme.focusGradientBrush
 import com.github.damontecres.wholphin.ui.AspectRatios
 import com.github.damontecres.wholphin.ui.FontAwesome
 import com.github.damontecres.wholphin.ui.PreviewTvSpec
@@ -112,7 +115,7 @@ fun PersonCard(
                             border =
                                 BorderStroke(
                                     width = 3.dp,
-                                    color = MaterialTheme.colorScheme.border,
+                                    brush = LocalTheme.current.focusGradientBrush() ?: SolidColor(MaterialTheme.colorScheme.border),
                                 ),
                             shape = CircleShape,
                         ),
@@ -121,7 +124,6 @@ fun PersonCard(
                 CardDefaults.colors(
                     containerColor = Color.Transparent,
                 ),
-            border = titaniumCardBorder(),
         ) {
             ItemCardImage(
                 imageUrl = imageUrl,
