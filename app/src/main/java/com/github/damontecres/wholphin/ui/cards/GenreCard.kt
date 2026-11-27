@@ -1,7 +1,9 @@
 package com.github.damontecres.wholphin.ui.cards
 
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,11 +11,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -25,6 +29,7 @@ import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import coil3.compose.AsyncImage
+import coil3.gif.AnimatedImageDecoder
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.github.damontecres.wholphin.ui.AspectRatios
@@ -60,13 +65,25 @@ fun GenreCard(
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    titaniumArt: Boolean = false,
 ) {
+    val focused by interactionSource.collectIsFocusedAsState()
+    val art = if (titaniumArt) titaniumGenres[name.orEmpty().lowercase().replace('-', ' ')] else null
+    val animated = art != null && focused && Build.VERSION.SDK_INT >= 28
+    val source =
+        if (art == null) {
+            imageUrl
+        } else {
+            val suffix = if (animated) "-motion" else ""
+            "file:///android_asset/titanium/$art$suffix.webp"
+        }
     val background = rememberIdColor(genreId).copy(alpha = .6f)
     Card(
         modifier = modifier,
         onClick = onClick,
         onLongClick = onLongClick,
         interactionSource = interactionSource,
+        border = titaniumCardBorder(),
         colors =
             CardDefaults.colors(
                 containerColor = Color.Transparent,
@@ -81,19 +98,23 @@ fun GenreCard(
                     .fillMaxSize()
                     .clip(RoundedCornerShape(8.dp)),
         ) {
-            if (imageUrl != null) {
+            if (source != null) {
                 AsyncImage(
                     model =
                         ImageRequest
                             .Builder(LocalContext.current)
-                            .data(imageUrl)
-                            .crossfade(true)
+                            .data(source)
+                            .apply {
+                                if (Build.VERSION.SDK_INT >= 28 && animated) {
+                                    decoderFactory(AnimatedImageDecoder.Factory())
+                                }
+                            }.crossfade(!animated)
                             .build(),
-                    contentScale = ContentScale.FillBounds,
+                    contentScale = if (art == null) ContentScale.FillBounds else ContentScale.Crop,
                     contentDescription = null,
                     modifier =
                         Modifier
-                            .alpha(.75f)
+                            .alpha(if (art == null) .75f else 1f)
                             .aspectRatio(AspectRatios.WIDE)
                             .fillMaxSize(),
                 )
@@ -103,7 +124,10 @@ fun GenreCard(
                     Modifier
                         .aspectRatio(AspectRatios.WIDE)
                         .fillMaxSize()
-                        .background(background),
+                        .background(
+                            if (art == null) Brush.verticalGradient(listOf(background, background))
+                            else Brush.verticalGradient(listOf(Color.Transparent, Color(0xAA050610))),
+                        ),
             ) {
                 Text(
                     text = name ?: "",
@@ -114,7 +138,7 @@ fun GenreCard(
                     modifier =
                         Modifier
                             .padding(16.dp)
-                            .align(Alignment.Center),
+                            .align(if (art == null) Alignment.Center else Alignment.BottomStart),
                 )
             }
         }

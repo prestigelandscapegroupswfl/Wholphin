@@ -88,6 +88,17 @@ fun HomeSettingsGlobal(
             }
             item {
                 ComposablePreference(
+                    preference = AppPreference.TitaniumHomeLayout,
+                    value = AppPreference.TitaniumHomeLayout.getter.invoke(preferences),
+                    onValueChange = {
+                        onPreferenceChange.invoke(AppPreference.TitaniumHomeLayout.setter.invoke(preferences, it))
+                    },
+                    onNavigate = {},
+                    modifier = Modifier,
+                )
+            }
+            item {
+                ComposablePreference(
                     preference = AppPreference.HomeClickToPlay,
                     value = AppPreference.HomeClickToPlay.getter.invoke(preferences),
                     onValueChange = {

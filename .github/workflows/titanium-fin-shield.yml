@@ -1,0 +1,48 @@
+name: Titanium Fin Shield preview
+
+on:
+  push:
+    branches: [titanium-fin]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the fork
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - name: Set up Java 21
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad
+        with:
+          distribution: zulu
+          java-version: '21'
+          cache: gradle
+      - name: Install Android SDK
+        uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd
+        with:
+          packages: 'platform-tools platforms;android-37.0 build-tools;37.0.0'
+      - name: Build Shield preview
+        run: ./gradlew :app:assembleAppstoreDebug --no-daemon
+      - name: Verify and package the APK
+        run: |
+          output=app/build/outputs/apk/appstore/debug
+          apk=$(python3 -c 'import json, sys; print(next(e["outputFile"] for e in json.load(sys.stdin)["elements"] if e["type"] == "UNIVERSAL"))' < "$output/output-metadata.json")
+          apk="$output/$apk"
+          test -f "$apk"
+          signer="$ANDROID_SDK_ROOT/build-tools/37.0.0/apksigner"
+          "$signer" verify --verbose "$apk"
+          mkdir shield
+          cp "$apk" shield/Titanium-Fin-Shield-Preview.apk
+          cd shield
+          sha256sum Titanium-Fin-Shield-Preview.apk > SHA256SUMS.txt
+      - name: Upload Shield preview
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: Titanium-Fin-Shield
+          path: shield/
+          if-no-files-found: error

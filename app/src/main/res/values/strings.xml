@@ -926,6 +926,11 @@
         <item>@string/subtitle_mode_none</item>
     </string-array>
 
+    <string name="titanium_home_layout">Home layout</string>
+    <string-array name="titanium_home_layout_options">
+        <item>Compact Neon</item>
+        <item>Cinematic</item>
+    </string-array>
     <string-array name="home_click_to_play_options">
         <item>@string/continue_watching_click_summary_off</item>
         <item>@string/continue_watching_click_summary_on</item>

@@ -226,6 +226,7 @@ fun HomePage(
                 showLogo = preferences.appPreferences.interfacePreferences.showLogos,
                 showViewMore = true,
                 onClickViewMore = onClickViewMore,
+                compactHome = !currentHomePrefs.classicHome,
                 modifier = modifier,
             )
             overviewDialog?.let { info ->
@@ -291,6 +292,7 @@ fun HomePageContent(
     listState: LazyListState = rememberLazyListState(),
     takeFocus: Boolean = true,
     showEmptyRows: Boolean = false,
+    compactHome: Boolean = false,
     headerComposable: @Composable (focusedItem: BaseItem?) -> Unit = { focusedItem ->
         HomePageHeader(
             item = focusedItem,
@@ -348,7 +350,11 @@ fun HomePageContent(
                         }
                     }.fillMaxSize(),
         ) {
-            headerComposable.invoke(focusedItem)
+            if (compactHome) {
+                TitaniumHomeHeader(focusedItem)
+            } else {
+                headerComposable.invoke(focusedItem)
+            }
 
             val density = LocalDensity.current
             val spaceAbovePx =
@@ -469,6 +475,7 @@ fun HomePageContent(
                                                     onClick = onClick,
                                                     onLongClick = onLongClick,
                                                     viewOptions = viewOptions,
+                                                    titaniumArt = compactHome,
                                                     modifier =
                                                         cardModifier
                                                             .onFocusChanged { onFocus(it.isFocused) }
@@ -641,6 +648,7 @@ fun HomePageCardContent(
     onLongClick: () -> Unit,
     viewOptions: HomeRowViewOptions,
     modifier: Modifier,
+    titaniumArt: Boolean = false,
 ) {
     when (item?.type) {
         BaseItemKind.GENRE -> {
@@ -651,6 +659,7 @@ fun HomePageCardContent(
                 onClick = onClick,
                 onLongClick = onLongClick,
                 modifier = modifier.height(viewOptions.heightDp.dp),
+                titaniumArt = titaniumArt,
             )
         }
 

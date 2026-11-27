@@ -218,6 +218,19 @@ sealed interface AppPreference<Pref, T> {
                 summaryOff = R.string.disabled,
             )
 
+        val TitaniumHomeLayout =
+            AppChoicePreference<AppPreferences, Boolean>(
+                title = R.string.titanium_home_layout,
+                defaultValue = false,
+                getter = { it.homePagePreferences.classicHome },
+                setter = { prefs, value ->
+                    prefs.updateHomePagePreferences { classicHome = value }
+                },
+                displayValues = R.array.titanium_home_layout_options,
+                indexToValue = { it == 1 },
+                valueToIndex = { if (it) 1 else 0 },
+            )
+
         val HomeClickToPlay =
             AppChoicePreference<AppPreferences, Boolean>(
                 title = R.string.continue_watching_click_behavior,

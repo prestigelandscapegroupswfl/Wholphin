@@ -50,7 +50,7 @@ val gitTags =
 
 val gitDescribe =
     providers
-        .exec { commandLine("git", "describe", "--tags", "--long", "--match=v*") }
+        .exec { commandLine("git", "describe", "--tags", "--long", "--always", "--match=v*") }
         .standardOutput.asText
         .getOrElse("v0.0.0")
 
