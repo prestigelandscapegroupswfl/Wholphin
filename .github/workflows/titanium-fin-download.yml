@@ -1,0 +1,23 @@
+name: Publish signed Shield preview
+on:
+  push:
+    branches: [titanium-fin-download]
+permissions:
+  contents: write
+  actions: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      APK: Titanium-Fin-Shield-Preview.apk
+      TAG: titanium-fin-shield-preview-1
+    steps:
+      - name: Download the verified Shield build
+        run: gh run download 46040965875 --name Titanium-Fin-Shield --dir shield
+      - name: Verify the exact APK and publish
+        run: |
+          cd shield
+          echo '11d1e6fb680ccc5b018f84c0cd96dede0356a9e81d298c6f1969f6978571cb0f  Titanium-Fin-Shield-Preview.apk' | sha256sum -c -
+          gh release create "$TAG" "$APK" SHA256SUMS.txt --target 3d3ed15e7e8e5f7f933aeea8495bbea68866d6de --prerelease --latest=false --title 'Titanium Fin Shield Preview 1' --notes 'Signed Android TV preview for NVIDIA Shield. Uses your existing Jellyfin server.'
